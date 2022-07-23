@@ -1,0 +1,37 @@
+from lib2to3.pgen2 import driver
+from ssl import Options
+from webbrowser import Chrome
+import pytest
+import selenium
+from selenium import webdriver
+from selenium.webdriver.chrome.options import chrome_options
+
+
+@pytest.fixture
+def get_chrome_options():
+    options = chrome_options()
+    # Use headless if you don't need a browser UI
+    options.add_argument('chrome')
+    options.add_argument('--start-maximized')
+    options.add_argument('--window-size=1200,920')
+    return Options
+
+
+@pytest.fixture
+def get_webdriver(get_chrome_options):
+    Options = get_chrome_options
+    driver = webdriver.chrome(execute_path='c:/123/', options=Options)
+    # usr->local->bin
+    return driver
+
+
+@pytest.fixture(scope='function')
+# clean start of tests,but it (scope='session') test start of all time browser session
+def setup(request, get_webdriver):
+    driver = get_webdriver
+    url = 'https://www.Wildberies.ru/'
+    if request.cls is None:
+        request.cls.driver = driver
+        driver.get(url)
+        yield driver
+        driver.quite()
